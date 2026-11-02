@@ -1,0 +1,104 @@
+<!-- mostly copying off and learning from Data Engineering youtube -->
+<!-- completely AI-less, because AI is for bums. I may be a bum, but I'm no bm. -->
+<style>
+    html,
+    body,
+    canvas {
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
+
+<canvas id="screen" style="width: 100%; height: 100%" />
+
+<script>
+    // initializes the screen as the canvas
+    const canvas = document.getElementById('screen');
+    const context = canvas.getContext('2d');
+
+    // counts FPS for debugging
+    const FPS = 60;
+    const cycleDelay = Math.floor(1000 / FPS);
+    var oldCycleTime = 0;
+    var cycleCount = 0;
+    var fpsRate = '...';
+
+    // establishes the map variables
+    const MAP_SIZE = 16; //how many tiles we have per map
+    const MAP_SCALE = 10; //how many pixels per tile
+    const MAP_RANGE = MAP_SCALE * MAP_SIZE;
+    const MAP_SPEED = (MAP_SCALE / 2) / 10;
+
+    var map = [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    ]
+
+    // screen constants
+    const WIDTH = 320, HALF_WIDTH = 160;
+    const HEIGHT = 200, HALF_HEIGHT = 100;
+
+
+    var i = 0;
+    // runs logic every tick
+    function gameLoop() {
+        // script for calcualting FPS
+        cycleCount++;
+        if (cycleCount => 60) cycleCount = 0;
+        var startTime = Date.now();
+        var cycleTime = startTime - oldCycleTime;
+        oldCycleTime = startTime;
+        if (cycleCount % 60 == 0) fpsRate = Math.floor(fpsRate = 1000 / cycleTime);
+
+        // resizes the canvas
+        canvas.width = window.innerWidth * 0.3;
+        canvas.height = window.innerHeight * 0.3;
+
+        //updates the screen every frame for smooth gameplay
+        context.fillStyle = 'White';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = 'Black';
+        context.fillRect(canvas.width / 2 - HALF_WIDTH, canvas.height / 2 - HALF_HEIGHT, WIDTH, HEIGHT);
+        if (i >= 32) i = 0
+        i++;
+
+        /// gets from the map array variable and draws it to the screen
+        for (var row = 0; row < MAP_SIZE; row++) {
+            for (var col = 0; col < MAP_SIZE; col++) {
+                var square = row * MAP_SIZE + col;
+                if (map[square] == 1) {
+                    context.fillStyle = '#0000ff';
+                    context.fillRect(Math.floor(canvas.width / 2 - MAP_RANGE / 2) + col * MAP_SCALE, Math.floor(canvas.height / 2 - MAP_RANGE / 2) + row * MAP_SCALE, MAP_SCALE, MAP_SCALE);
+                } else {
+                    context.fillStyle = '#aaa'
+                    context.fillRect(Math.floor(canvas.width / 2 - MAP_RANGE / 2) + col * MAP_SCALE, Math.floor(canvas.height / 2 - MAP_RANGE / 2) + row * MAP_SCALE, MAP_SCALE, MAP_SCALE);
+                }
+            }
+        }
+
+
+        // sets gameLoop to run infinitely, delayed by cycleDelay so theres less stuttering
+        setTimeout(gameLoop, cycleDelay);
+
+        // this renders fps to screen for debugging purposes
+        context.fillStyle = 'Black';
+        context.font = '16px Monospace';
+        context.fillText('FPS: ' + fpsRate, 0, 20);
+
+    } window.onload = function () { gameLoop(); };
+
+</script>
