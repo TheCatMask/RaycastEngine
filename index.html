@@ -54,11 +54,15 @@
         2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     ]
     var showMap = false;
+    const PLAYERSTARTX = 2;
+    const PLAYERSTARTY = 13;
+    const PLAYERSTARTANGLE = 2; // 1 faces left, 2 faces up, 3 faces right, 4 faces down
 
     // player script
-    var playerX = MAP_SCALE + 20;
-    var playerY = MAP_SCALE + 20;
-    var playerAngle = Math.PI / 3;
+    var playerX = (MAP_SCALE / 2) + (MAP_SCALE * PLAYERSTARTX);
+    var playerY = (MAP_SCALE / 2) + (MAP_SCALE * PLAYERSTARTY);
+    var playerAngle = (Math.PI / 2) * (PLAYERSTARTANGLE);
+    var playerSprint = 0; // for math reasons, use 1 and 0 instead of true and false
 
     var playerMoveX = 0;
     var playerMoveY = 0;
@@ -70,7 +74,6 @@
 
     //handle user input
     document.onkeydown = function (event) {
-        console.log(event.keyCode)
         switch (event.keyCode) {
             // tank controls
 
@@ -84,6 +87,7 @@
             case 39: playerMoveAngle = -1; break; // right arrow
             case 77: // tab
             case 9: showMap = true; break; // M
+            case 16: playerSprint = 1; // shift
 
         }
     }
@@ -100,6 +104,7 @@
             case 39: playerMoveAngle = 0; break;
             case 77:
             case 9: showMap = false; break;
+            case 16: playerSprint = 0; // shift
         }
     }
 
@@ -113,7 +118,7 @@
     const WALLS = [];
 
     // load wall textures
-    for (var filename = 0; filename < 10; filename++) {
+    for (var filename = 0; filename < 3; filename++) {
         var image = document.createElement('img');
         image.src = 'assets/walls/' + filename + '.png'
         WALLS.push(image);
@@ -123,6 +128,7 @@
     // runs logic every tick
     function gameLoop() {
         // script for calcualting FPS
+        console.log(playerSprint)
         cycleCount++;
         if (cycleCount => 60) cycleCount = 0;
         var startTime = Date.now();
