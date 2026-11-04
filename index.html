@@ -51,6 +51,7 @@
         1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     ]
+    var showMap = false;
 
     // player script
     var playerX = MAP_SCALE + 20;
@@ -60,6 +61,9 @@
     var playerMoveX = 0;
     var playerMoveY = 0;
     var playerMoveAngle = 0;
+
+    mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
+    mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
 
     //handle user input
     document.onkeydown = function (event) {
@@ -75,6 +79,8 @@
             case 37: playerMoveAngle = 1; break; // left arrow
             case 68: // D
             case 39: playerMoveAngle = -1; break; // right arrow
+            case 77: // tab
+            case 9: showMap = true; break; // M
 
         }
     }
@@ -89,12 +95,14 @@
             case 68:
             case 37:
             case 39: playerMoveAngle = 0; break;
+            case 77:
+            case 9: showMap = false; break;
         }
     }
 
     // players camera
     const DOUBLE_PI = Math.PI * 2;
-    const FOV = Math.pi / 3;
+    const FOV = Math.PI / 3;
     const HALF_FOV = FOV / 2;
     const STEP_ANGLE = FOV / WIDTH;
 
@@ -133,105 +141,102 @@
         if (playerMoveY && map[mapTargetY] == 0) playerY += playerOffsetY * playerMoveY;
         if (playerMoveAngle) playerAngle += 0.03 * playerMoveAngle;
 
-        /// gets from the map array variable and draws it to the screen
-        var mapOffsetX = Math.floor(canvas.width / 2 - MAP_RANGE / 2);
-        var mapOffsetY = Math.floor(canvas.height / 2 - MAP_RANGE / 2);
-
-        for (var row = 0; row < MAP_SIZE; row++) {
-            for (var col = 0; col < MAP_SIZE; col++) {
-                var square = row * MAP_SIZE + col;
-                if (map[square] != 0) {
-                    context.fillStyle = '#0000ff';
-                    context.fillRect(mapOffsetX + col * MAP_SCALE, mapOffsetY + row * MAP_SCALE, MAP_SCALE, MAP_SCALE);
-                } else {
-                    context.fillStyle = '#aaa'
-                    context.fillRect(mapOffsetX + col * MAP_SCALE, mapOffsetY + row * MAP_SCALE, MAP_SCALE, MAP_SCALE);
-                }
-            }
-        }
-
-        var playerMapX = playerX + mapOffsetX;
-        var playerMapY = playerY + mapOffsetY;
-
-        context.fillStyle = 'Red';
-        context.beginPath();
-        context.arc(playerMapX, playerMapY, 2, 0, DOUBLE_PI);
-        context.fill();
-        context.strokeStyle = 'Red';
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(playerMapX, playerMapY);
-        context.lineTo(playerMapX + Math.sin(playerAngle) * 10, playerMapY + Math.cos(playerAngle) * 10);
-        context.stroke();
-
         // draws the 3D map via raycasting
-        var currentAngle = playerAngle;
+        var currentAngle = playerAngle + HALF_FOV;
         var raystartX = Math.floor(playerX / MAP_SCALE) * MAP_SCALE;
         var raystartY = Math.floor(playerY / MAP_SCALE) * MAP_SCALE;
 
-        var currentSin = Math.sin(currentAngle); currentSin = currentSin ? currentSin : 0.00000001; //if currentSin == 0, make it 0.000001 instead
-        var currentCos = Math.cos(currentAngle); currentCos = currentCos ? currentCos : 0.00000001; //if currentCos == 0, make it 0.000001 instead
+        // loop over casted rays
+        for (var ray = 0; ray < WIDTH; ray++) {
+            // get current angle / cosine
+            var currentSin = Math.sin(currentAngle); currentSin = currentSin ? currentSin : 0.00000001; //if currentSin == 0, make it 0.000001 instead
+            var currentCos = Math.cos(currentAngle); currentCos = currentCos ? currentCos : 0.00000001; //if currentCos == 0, make it 0.000001 instead
 
-        // vertical line intersection
-        var rayEndX, rayEndY, rayDirectionX, verticalDepth;
-        if (currentSin > 0) { rayEndX = raystartX + MAP_SCALE; rayDirectionX = 1 }
-        else { rayEndX = raystartX; rayDirectionX = -1 };
 
-        for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
-            verticalDepth = (rayEndX - playerX) / currentSin;
-            rayEndY = playerY + verticalDepth * currentCos;
+            // vertical line intersection
+            var rayEndX, rayEndY, rayDirectionX, verticalDepth;
+            if (currentSin > 0) { rayEndX = raystartX + MAP_SCALE; rayDirectionX = 1 }
+            else { rayEndX = raystartX; rayDirectionX = -1 };
 
-            var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
-            var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+            for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+                verticalDepth = (rayEndX - playerX) / currentSin;
+                rayEndY = playerY + verticalDepth * currentCos;
 
-            if (currentSin <= 0) mapTargetX += rayDirectionX;
-            var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+                var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+                var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
 
-            if (targetSquare < 0 || targetSquare > map.length - 1) break;
-            if (map[targetSquare] != 0) break;
-            rayEndX += rayDirectionX * MAP_SCALE;
-        }
+                if (currentSin <= 0) mapTargetX += rayDirectionX;
+                var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
 
-        var tempX = rayEndX; tempY = rayEndY;
+                if (targetSquare < 0 || targetSquare > map.length - 1) break;
+                if (map[targetSquare] != 0) break;
+                rayEndX += rayDirectionX * MAP_SCALE;
+            }
 
-        // // draw ray for raycast
-        // context.strokeStyle = 'Yellow';
-        // context.lineWidth = 1;
-        // context.beginPath();
-        // context.moveTo(playerMapX, playerMapY);
-        // context.lineTo(rayEndX + mapOffsetX, rayEndY + mapOffsetY);
-        // context.stroke();
+            var rayEndY, rayEndX, rayDirectionY, horizontalDepth;
+            if (currentCos > 0) { rayEndY = raystartY + MAP_SCALE; rayDirectionY = 1 }
+            else { rayEndY = raystartY; rayDirectionY = -1 };
 
-        // horizontal line intersection
-        var rayEndY, rayEndX, rayDirectionY, horizontalDepth;
-        if (currentCos > 0) { rayEndY = raystartY + MAP_SCALE; rayDirectionY = 1 }
-        else { rayEndY = raystartY; rayDirectionY = -1 };
+            for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+                horizontalDepth = (rayEndY - playerY) / currentCos;
+                rayEndX = playerX + horizontalDepth * currentSin;
 
-        for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
-            horizontalDepth = (rayEndY - playerY) / currentCos;
-            rayEndX = playerX + horizontalDepth * currentSin;
+                var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+                var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
 
-            var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
-            var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+                if (currentCos <= 0) mapTargetY += rayDirectionY;
+                var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
 
-            if (currentCos <= 0) mapTargetY += rayDirectionY;
-            var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+                if (targetSquare < 0 || targetSquare > map.length - 1) break;
+                if (map[targetSquare] != 0) break;
+                rayEndY += rayDirectionY * MAP_SCALE;
+            }
 
-            if (targetSquare < 0 || targetSquare > map.length - 1) break;
-            if (map[targetSquare] != 0) break;
-            rayEndY += rayDirectionY * MAP_SCALE;
-        }
+            //render the 3d projection
+            mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
+            mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
 
-        var endX = verticalDepth < horizontalDepth ? tempX : rayEndX;
-        var endY = verticalDepth < horizontalDepth ? tempY : rayEndY;
+            var depth = verticalDepth < horizontalDepth ? verticalDepth : horizontalDepth;
+            depth *= Math.cos(playerAngle - currentAngle); // prevents fish eye
+            var wallHeight = Math.min(MAP_SCALE * 300 / (depth + 0.0001), HEIGHT);
+            context.fillStyle = verticalDepth < horizontalDepth ? '#0000ff' : '#0000aa'
+            context.fillRect(mapOffsetX + ray, mapOffsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
 
-        // draw ray for raycast
-        context.strokeStyle = 'Yellow';
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(playerMapX, playerMapY);
-        context.lineTo(endX + mapOffsetX, endY + mapOffsetY);
-        context.stroke();
+            //update current angle
+            currentAngle -= STEP_ANGLE;
+        };
+
+        //draw map if showMap is true
+        if (showMap) {
+            mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
+            mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
+            for (var row = 0; row < MAP_SIZE; row++) {
+                for (var col = 0; col < MAP_SIZE; col++) {
+                    var square = row * MAP_SIZE + col;
+                    if (map[square] != 0) {
+                        context.fillStyle = '#0000ff';
+                        context.fillRect(mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
+                    } else {
+                        context.fillStyle = '#aaa'
+                        context.fillRect(mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
+                    }
+                }
+            }
+
+            var playerMapX = (playerX / MAP_SCALE) * 5 + mapOffsetX;
+            var playerMapY = (playerY / MAP_SCALE) * 5 + mapOffsetY;
+
+            context.fillStyle = 'Red';
+            context.beginPath();
+            context.arc(playerMapX, playerMapY, 1, 0, DOUBLE_PI);
+            context.fill();
+            context.strokeStyle = 'Red';
+            context.lineWidth = 1;
+            context.beginPath();
+            context.moveTo(playerMapX, playerMapY);
+            context.lineTo(playerMapX + Math.sin(playerAngle) * 5, playerMapY + Math.cos(playerAngle) * 5);
+            context.stroke();
+        };
 
         // sets gameLoop to run infinitely, delayed by cycleDelay so theres less stuttering
         setTimeout(gameLoop, cycleDelay);
