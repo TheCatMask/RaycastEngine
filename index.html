@@ -6,6 +6,8 @@
     canvas {
         margin: 0px;
         padding: 0px;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
     }
 </style>
 
@@ -17,8 +19,8 @@
     const context = canvas.getContext('2d');
 
     // screen constants
-    const WIDTH = 320, HALF_WIDTH = 160;
-    const HEIGHT = 200, HALF_HEIGHT = 100;
+    const WIDTH = 320, HALF_WIDTH = WIDTH / 2;
+    const HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
 
     // counts FPS for debugging
     const FPS = 60;
@@ -29,27 +31,27 @@
 
     // establishes the map variables
     const MAP_SIZE = 16; //how many tiles we have per map
-    const MAP_SCALE = 15; //how many pixels per tile
+    const MAP_SCALE = 64; //how many pixels per tile
     const MAP_RANGE = MAP_SCALE * MAP_SIZE;
     const MAP_SPEED = (MAP_SCALE / 2) / 10;
 
     var map = [
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        2, 2, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        2, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 2, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     ]
     var showMap = false;
 
@@ -61,9 +63,10 @@
     var playerMoveX = 0;
     var playerMoveY = 0;
     var playerMoveAngle = 0;
+    var playerRadius = 5;
 
-    mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
-    mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
+    var mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
+    var mapOffsetY = Math.floor(canvas.height / 2) - HALF_HEIGHT;
 
     //handle user input
     document.onkeydown = function (event) {
@@ -106,6 +109,15 @@
     const HALF_FOV = FOV / 2;
     const STEP_ANGLE = FOV / WIDTH;
 
+    // applies textures to walls
+    const WALLS = [];
+
+    // load wall textures
+    for (var filename = 0; filename < 10; filename++) {
+        var image = document.createElement('img');
+        image.src = 'assets/walls/' + filename + '.png'
+        WALLS.push(image);
+    }
 
     var i = 0;
     // runs logic every tick
@@ -123,10 +135,8 @@
         canvas.height = window.innerHeight * 0.3;
 
         //updates the screen every frame for smooth gameplay
-        context.fillStyle = 'White';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = 'Black';
-        context.fillRect(canvas.width / 2 - HALF_WIDTH, canvas.height / 2 - HALF_HEIGHT, WIDTH, HEIGHT);
+        //draws background
+        context.drawImage(WALLS[0], canvas.width / 2 - HALF_WIDTH, canvas.height / 2 - HALF_HEIGHT);
         if (i >= 32) i = 0
         i++;
 
@@ -134,8 +144,8 @@
         var playerOffsetX = Math.sin(playerAngle) * MAP_SPEED;
         var playerOffsetY = Math.cos(playerAngle) * MAP_SPEED;
 
-        var mapTargetX = Math.floor(playerY / MAP_SCALE) * MAP_SIZE + Math.floor((playerX + playerOffsetX * playerMoveX) / MAP_SCALE);
-        var mapTargetY = Math.floor((playerY + playerOffsetY * playerMoveY) / MAP_SCALE) * MAP_SIZE + Math.floor(playerX / MAP_SCALE);
+        var mapTargetX = Math.floor(playerY / MAP_SCALE) * MAP_SIZE + Math.floor((playerX + playerOffsetX * playerMoveX * playerRadius) / MAP_SCALE);
+        var mapTargetY = Math.floor((playerY + playerOffsetY * playerMoveY * playerRadius) / MAP_SCALE) * MAP_SIZE + Math.floor(playerX / MAP_SCALE);
 
         if (playerMoveX && map[mapTargetX] == 0) playerX += playerOffsetX * playerMoveX;
         if (playerMoveY && map[mapTargetY] == 0) playerY += playerOffsetY * playerMoveY;
@@ -154,7 +164,7 @@
 
 
             // vertical line intersection
-            var rayEndX, rayEndY, rayDirectionX, verticalDepth;
+            var rayEndX, rayEndY, rayDirectionX, verticalDepth, textureEndY, textureY;
             if (currentSin > 0) { rayEndX = raystartX + MAP_SCALE; rayDirectionX = 1 }
             else { rayEndX = raystartX; rayDirectionX = -1 };
 
@@ -169,11 +179,12 @@
                 var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
 
                 if (targetSquare < 0 || targetSquare > map.length - 1) break;
-                if (map[targetSquare] != 0) break;
+                if (map[targetSquare] != 0) { textureY = map[targetSquare]; break; };
                 rayEndX += rayDirectionX * MAP_SCALE;
             }
+            textureEndY = rayEndY;
 
-            var rayEndY, rayEndX, rayDirectionY, horizontalDepth;
+            var rayEndY, rayEndX, rayDirectionY, horizontalDepth, textureEndX, textureX;
             if (currentCos > 0) { rayEndY = raystartY + MAP_SCALE; rayDirectionY = 1 }
             else { rayEndY = raystartY; rayDirectionY = -1 };
 
@@ -188,25 +199,41 @@
                 var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
 
                 if (targetSquare < 0 || targetSquare > map.length - 1) break;
-                if (map[targetSquare] != 0) break;
+                if (map[targetSquare] != 0) { textureX = map[targetSquare]; break; };
                 rayEndY += rayDirectionY * MAP_SCALE;
             }
+            textureEndX = rayEndX;
 
             //render the 3d projection
             mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
             mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
 
             var depth = verticalDepth < horizontalDepth ? verticalDepth : horizontalDepth;
+            var textureImage = verticalDepth < horizontalDepth ? textureY : textureX;
+            var textureOffset = verticalDepth < horizontalDepth ? textureEndY : textureEndX;
+            textureOffset = Math.floor(textureOffset - Math.floor(textureOffset / MAP_SCALE) * MAP_SCALE);
             depth *= Math.cos(playerAngle - currentAngle); // prevents fish eye
-            var wallHeight = Math.min(MAP_SCALE * 300 / (depth + 0.0001), HEIGHT);
+            var wallHeight = Math.min(Math.floor(MAP_SCALE * 280 / (depth + 0.0001)), 50000);
             context.fillStyle = verticalDepth < horizontalDepth ? '#0000ff' : '#0000aa'
-            context.fillRect(mapOffsetX + ray, mapOffsetY + (HEIGHT / 2 - wallHeight / 2), 1, wallHeight);
+            context.fillRect(mapOffsetX + ray, mapOffsetY + (HALF_HEIGHT - wallHeight / 2), 1, wallHeight);
+
+            context.drawImage(
+                WALLS[textureImage],
+                textureOffset,                                             //source imaeg x offset
+                0,                                              //source image y offset
+                1,                                              //source image width
+                64,                                             //source image height
+                mapOffsetX + ray,                               //target image X offset
+                mapOffsetY + (HALF_HEIGHT - Math.floor(wallHeight / 2)),    //target image y offset
+                1,                                              //target image width
+                wallHeight,                                     //target image height
+            );
 
             //update current angle
             currentAngle -= STEP_ANGLE;
         };
 
-        //draw map if showMap is true
+        // draw map only if showMap is true
         if (showMap) {
             mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
             mapOffsetY = Math.floor(canvas.height / 2 - HALF_HEIGHT);
@@ -223,12 +250,12 @@
                 }
             }
 
-            var playerMapX = (playerX / MAP_SCALE) * 5 + mapOffsetX;
-            var playerMapY = (playerY / MAP_SCALE) * 5 + mapOffsetY;
+            playerMapX = (playerX / MAP_SCALE) * 5 + mapOffsetX;
+            playerMapY = (playerY / MAP_SCALE) * 5 + mapOffsetY;
 
             context.fillStyle = 'Red';
             context.beginPath();
-            context.arc(playerMapX, playerMapY, 1, 0, DOUBLE_PI);
+            context.arc(playerMapX, playerMapY, 2, 2, DOUBLE_PI);
             context.fill();
             context.strokeStyle = 'Red';
             context.lineWidth = 1;
@@ -237,6 +264,11 @@
             context.lineTo(playerMapX + Math.sin(playerAngle) * 5, playerMapY + Math.cos(playerAngle) * 5);
             context.stroke();
         };
+
+        // fix wall clipping out of game space
+        context.fillStyle = 'White';
+        context.fillRect(0, 0, canvas.width, mapOffsetY);
+        context.fillRect(0, mapOffsetY + HEIGHT, canvas.width, canvas.width - mapOffsetY + WIDTH);
 
         // sets gameLoop to run infinitely, delayed by cycleDelay so theres less stuttering
         setTimeout(gameLoop, cycleDelay);
