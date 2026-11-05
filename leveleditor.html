@@ -99,10 +99,10 @@
             for (var col = 0; col < MAP_SIZE; col++) {
                 var square = row * MAP_SIZE + col;
                 if (map[square] != 0) {
-                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (4 + zoom), (4 + zoom));
+                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.8 + zoom), (3.8 + zoom));
                 } else {
                     context.fillStyle = '#000000'
-                    context.fillRect(Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (4 + zoom), (4 + zoom));
+                    context.fillRect(Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.8 + zoom), (3.8 + zoom)); // 3.8 instead of 4 for outlines
                 }
 
             }
