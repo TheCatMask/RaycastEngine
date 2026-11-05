@@ -44,14 +44,14 @@
         2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
         2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
         2, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 2, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+        2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,
     ]
     var showMap = false;
     const PLAYERSTARTX = 2;
@@ -87,7 +87,7 @@
             case 39: playerMoveAngle = -1; break; // right arrow
             case 77: // tab
             case 9: showMap = true; break; // M
-            case 16: playerSprint = 1; // shift
+            case 16: playerSprint = 3; // shift
 
         }
     }
@@ -128,7 +128,6 @@
     // runs logic every tick
     function gameLoop() {
         // script for calcualting FPS
-        console.log(playerSprint)
         cycleCount++;
         if (cycleCount => 60) cycleCount = 0;
         var startTime = Date.now();
@@ -147,8 +146,8 @@
         i++;
 
         // moves the player around based on players input
-        var playerOffsetX = Math.sin(playerAngle) * MAP_SPEED;
-        var playerOffsetY = Math.cos(playerAngle) * MAP_SPEED;
+        var playerOffsetX = Math.sin(playerAngle) * (MAP_SPEED + (1 * playerSprint));
+        var playerOffsetY = Math.cos(playerAngle) * (MAP_SPEED + (1 * playerSprint));
 
         var mapTargetX = Math.floor(playerY / MAP_SCALE) * MAP_SIZE + Math.floor((playerX + playerOffsetX * playerMoveX * playerRadius) / MAP_SCALE);
         var mapTargetY = Math.floor((playerY + playerOffsetY * playerMoveY * playerRadius) / MAP_SCALE) * MAP_SIZE + Math.floor(playerX / MAP_SCALE);
@@ -225,7 +224,7 @@
 
             context.drawImage(
                 WALLS[textureImage],
-                textureOffset,                                             //source imaeg x offset
+                textureOffset,                                  //source imaeg x offset
                 0,                                              //source image y offset
                 1,                                              //source image width
                 64,                                             //source image height
@@ -247,10 +246,11 @@
                 for (var col = 0; col < MAP_SIZE; col++) {
                     var square = row * MAP_SIZE + col;
                     if (map[square] != 0) {
-                        context.fillStyle = '#0000ff';
-                        context.fillRect(mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
+                        // context.fillStyle = '#00ff00';
+                        // context.fillRect(mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
+                        context.drawImage(WALLS[map[square]], 0, 0, 64, 64, mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
                     } else {
-                        context.fillStyle = '#aaa'
+                        context.fillStyle = '#000000'
                         context.fillRect(mapOffsetX + col * 5, mapOffsetY + row * 5, 5, 5);
                     }
                 }
@@ -259,11 +259,11 @@
             playerMapX = (playerX / MAP_SCALE) * 5 + mapOffsetX;
             playerMapY = (playerY / MAP_SCALE) * 5 + mapOffsetY;
 
-            context.fillStyle = 'Red';
+            context.fillStyle = '#00ff00';
             context.beginPath();
             context.arc(playerMapX, playerMapY, 2, 2, DOUBLE_PI);
             context.fill();
-            context.strokeStyle = 'Red';
+            context.strokeStyle = '#00ff00';
             context.lineWidth = 1;
             context.beginPath();
             context.moveTo(playerMapX, playerMapY);
