@@ -9,12 +9,24 @@
         margin: 0px;
         padding: 0px;
         image-rendering: -moz-crisp-edges;
-        image-rendering: -webkit-optimize-contrast;
+        image-rendering: -webk it-optimize-contrast;
+    }
+
+    .special {
+        padding: auto;
+        margin: auto;
     }
 </style>
 
 <canvas id="screen" style="width: 100%; height: 100%" />
 
+<html>
+
+<body>
+    <button class="special">Hey!</button>
+</body>
+
+</html>
 
 <script>
     const canvas = document.getElementById('screen');
@@ -29,35 +41,68 @@
     var cycleCount = 0;
     var fpsRate = '...';
 
-    const MAP_SIZE = 16; //how many tiles we have per map
+    const MAP_SIZE = 32; //how many tiles we have per map
 
     const mapDefault = [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
     ]
 
     var map = mapDefault
 
+    const tiles = [
+        {
+            name: "Empty",
+            description: "Empty space, sprites and entities can be put here",
+        },
+        {
+            name: "Brick Wall",
+            description: "used to build level geometry",
+        },
+        {
+            name: "Fence",
+            description: "used to build level geometry",
+        },
+    ]
+
+    var setTile = 0;
     const MAP_DISPLAY_SIZE = 1;
 
     var mapOffsetX = 0;
     var mapOffsetY = 0;
-    var zoom = 1;
+    var zoom = 5;
+    const MAP_DEFAULT_ZOOM = 16;
 
     const WALLS = [];
 
@@ -74,14 +119,20 @@
 
     document.onkeydown = function (event) {
         switch (event.keyCode) {
-            case 69: zoom += 1; break; // E
-            case 81: zoom += -1; break; // Q
+            case 61: zoom += 1; break; // = (+)
+            case 173: zoom += -1; break; // -
+
             case 87: mapOffsetY -= 2 + (zoom / 2); break; // W
             case 65: mapOffsetX -= 2 + (zoom / 2); break; // A
             case 83: mapOffsetY += 2 + (zoom / 2); break;
-            case 68: mapOffsetX += 2 + (zoom / 2);
+            case 68: mapOffsetX += 2 + (zoom / 2); break;
+
+            case 81: setTile += -1; break;
+            case 69: setTile += 1; break;
         }
     }
+
+    clamp(setTile, 0, tiles.length)
 
     window.addEventListener('mousemove', function (mousePos) {
         mousePosX = mousePos.x - canvas.getBoundingClientRect().left;
@@ -101,6 +152,17 @@
 
     var i = 0;
 
+    // Source - https://stackoverflow.com/a/11410079
+    // Posted by dweeves, modified by community. See post 'Timeline' for change history
+    // Retrieved 2026-11-06, License - CC BY-SA 4.0
+
+    function clamp(num, min, max) {
+        return num <= min
+            ? min
+            : num >= max
+                ? max
+                : num
+    }
 
 
     function gameLoop() {
@@ -114,8 +176,8 @@
         oldCycleTime = startTime;
         if (cycleCount % 60 == 0) fpsRate = Math.floor(fpsRate = 1000 / cycleTime);
 
-        var mouseTileX = Math.floor(mousePosX / (MAP_SIZE / 3.25)); // i have no idea why 3.25 is the golden number
-        var mouseTileY = Math.floor(mousePosY / (MAP_SIZE / 3.25));
+        var mouseTileX = Math.floor(mousePosX / (MAP_SIZE / 3.25 * (2.13)));  // i have no idea why 3.25 is the golden number
+        var mouseTileY = Math.floor(mousePosY / (MAP_SIZE / 3.25 * (2.12)));
 
         var indexOnMouse = 0;
         // needed for setting tiles: prevents setting them if mouse isn't on grid)
@@ -125,31 +187,48 @@
             indexOnMouse = Math.floor(mouseTileX + (mouseTileY * MAP_SIZE));
         }
 
-        console.log(indexOnMouse);
 
 
         for (var row = 0; row < MAP_SIZE; row++) {
             for (var col = 0; col < MAP_SIZE; col++) {
                 var square = row * MAP_SIZE + col;
                 if (map[square] != 0) {
-                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.5 + zoom), (3.5 + zoom))
+                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (MAP_DEFAULT_ZOOM + zoom)), Math.floor(mapOffsetY + row * (MAP_DEFAULT_ZOOM + zoom)), (MAP_DEFAULT_ZOOM + zoom), (MAP_DEFAULT_ZOOM + zoom))
                 } else {
                     context.fillStyle = '#000000'
-                    context.fillRect(Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.5 + zoom), (3.5 + zoom)); // 3.8 instead of 4 for outlines
+                    context.fillRect(Math.floor(mapOffsetX + col * (MAP_DEFAULT_ZOOM + zoom)), Math.floor(mapOffsetY + row * (MAP_DEFAULT_ZOOM + zoom)), (MAP_DEFAULT_ZOOM + zoom), (MAP_DEFAULT_ZOOM + zoom)); // 3.8 instead of 4 for outlines
                 }
             }
         }
 
+
+        setTile = clamp(setTile, 0, tiles.length - 1)
+        // set up selection menu
+        context.drawImage(WALLS[setTile], 0, 0, 64, 64, (160 * zoom), (10 * zoom), 64 * zoom, 64 * zoom);
+
+        context.fillStyle = 'Black';
+        context.font = '32px Monospace';
+
+        context.fillText(tiles[setTile].name, (160 * zoom), (82 * zoom));
+
+        context.fillStyle = 'Black';
+        context.font = '16px Monospace';
+
+        context.fillText(tiles[setTile].description, (160 * zoom), (92 * zoom));
+
+
         if (mouseDown) {
-            map[indexOnMouse] = 1;
+            map[indexOnMouse] = setTile;
         }
 
         setTimeout(gameLoop, cycleDelay);
 
+
+
         // this renders fps to screen for debugging purposes
-        // context.fillStyle = 'Black';
-        // context.font = '16px Monospace';
-        // context.fillText('FPS: ' + fpsRate, 0, 20);
+        context.fillStyle = 'Black';
+        context.font = '64px Monospace';
+        context.fillText('FPS: ' + fpsRate, (1 * zoom), (182 * zoom));
 
     } window.onload = function () { gameLoop(); };
 
