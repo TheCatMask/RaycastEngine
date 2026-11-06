@@ -175,11 +175,14 @@
 
 
     mapSave.addEventListener("click", (event) => {
+        var maptoDownloadString = map.toString(); // so we have the commas and stuff
         var blob = new Blob(map, { type: 'text/plain' });
         var link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = "data:text/plain," + encodeURIComponent(maptoDownloadString);
         link.download = 'map.txt';
         link.click();
+
+        console.log(map.toString())
     });
 
     function gameLoop() {
