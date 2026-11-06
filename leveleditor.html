@@ -22,7 +22,6 @@
 <body>
     <button class="special" id="mapSave">Save</button>
     <button class="special" id="mapNew">New</button>
-    <input type="file" class="special" id="mapLoad"></input>
 </body>
 
 </html>
@@ -35,7 +34,6 @@
     const context = canvas.getContext('2d');
 
     const mapSave = document.getElementById('mapSave');
-    const mapLoad = document.getElementById('mapLoad');
     const mapNew = document.getElementById('mapNew');
 
     const WIDTH = 320, HALF_WIDTH = WIDTH / 2;
@@ -83,9 +81,10 @@
         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
-    ]
+    ];
 
-    var map = mapDefault
+    var map = mapDefault;
+    var datatoread = map;
 
     const tiles = [
         {
@@ -183,16 +182,6 @@
         link.click();
     });
 
-    mapLoad.addEventListener("click", (event) => {
-        var fr = new FileReader();
-        fr.readAsText(mapLoad.files[0]);
-        fr.onload = function () {
-        }
-        datatoread = null;
-    });
-
-
-
     function gameLoop() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -215,7 +204,7 @@
             indexOnMouse = Math.floor(mouseTileX + (mouseTileY * MAP_SIZE));
         }
 
-
+        map = datatoread;
 
         for (var row = 0; row < MAP_SIZE; row++) {
             for (var col = 0; col < MAP_SIZE; col++) {
