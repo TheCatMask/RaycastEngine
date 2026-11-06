@@ -1,36 +1,42 @@
 <!-- doing this one from scratch because i am NOT making the levels by changing the arrays like that -->
 <!-- completely AI-less, because AI is for bums. I may be a bum, but I'm no bm. -->
 
+<!DOCTYPE html>
+<html lang="en">
 
-<style>
-    html,
-    body,
-    canvas {
-        margin: 0px;
-        padding: 0px;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: -webk it-optimize-contrast;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 
-    .special {
-        padding: auto;
-        margin: auto;
-    }
-</style>
+    <style>
+        .special {
+            padding: auto;
+            margin: auto;
+            position: 0px 0px 100px 100px;
+        }
+    </style>
 
-<canvas id="screen" style="width: 100%; height: 100%" />
-
-<html>
+</head>
 
 <body>
-    <button class="special">Hey!</button>
+    <button class="special" id="mapSave">Save</button>
+    <button class="special" id="mapNew">New</button>
+    <input type="file" class="special" id="mapLoad"></input>
 </body>
 
 </html>
 
+<canvas id="screen" style="width: auto; height: auto" />
+
+
 <script>
     const canvas = document.getElementById('screen');
     const context = canvas.getContext('2d');
+
+    const mapSave = document.getElementById('mapSave');
+    const mapLoad = document.getElementById('mapLoad');
+    const mapNew = document.getElementById('mapNew');
 
     const WIDTH = 320, HALF_WIDTH = WIDTH / 2;
     const HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
@@ -164,6 +170,28 @@
                 : num
     }
 
+    mapNew.addEventListener("click", (event) => {
+        window.location.reload();
+    });
+
+
+    mapSave.addEventListener("click", (event) => {
+        var blob = new Blob(map, { type: 'text/plain' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'map.txt';
+        link.click();
+    });
+
+    mapLoad.addEventListener("click", (event) => {
+        var fr = new FileReader();
+        fr.readAsText(mapLoad.files[0]);
+        fr.onload = function () {
+        }
+        datatoread = null;
+    });
+
+
 
     function gameLoop() {
         canvas.width = window.innerWidth;
@@ -203,6 +231,7 @@
 
 
         setTile = clamp(setTile, 0, tiles.length - 1)
+
         // set up selection menu
         context.drawImage(WALLS[setTile], 0, 0, 64, 64, (160 * zoom), (10 * zoom), 64 * zoom, 64 * zoom);
 
@@ -228,7 +257,7 @@
         // this renders fps to screen for debugging purposes
         context.fillStyle = 'Black';
         context.font = '64px Monospace';
-        context.fillText('FPS: ' + fpsRate, (1 * zoom), (182 * zoom));
+        context.fillText('FPS: ' + fpsRate, (1 * zoom), (162 * zoom));
 
     } window.onload = function () { gameLoop(); };
 
