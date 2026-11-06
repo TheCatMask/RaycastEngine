@@ -31,27 +31,33 @@
 
     const MAP_SIZE = 16; //how many tiles we have per map
 
-    var map = [
-        2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        2, 2, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        2, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-        2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2,
+    const mapDefault = [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
     ]
 
-    var mapOffsetX = canvas.width;
-    var mapOffsetY = canvas.height;
+    var map = mapDefault
+
+    const MAP_DISPLAY_SIZE = 1;
+
+    var mapOffsetX = 0;
+    var mapOffsetY = 0;
+    var zoom = 1;
 
     const WALLS = [];
 
@@ -62,10 +68,9 @@
         WALLS.push(image);
     }
 
-    // map editing variables, QOL
-    zoom = 1
-
-
+    var mousePosX = 0;
+    var mousePosY = 0;
+    var mouseDown = false;
 
     document.onkeydown = function (event) {
         switch (event.keyCode) {
@@ -78,15 +83,29 @@
         }
     }
 
-    if (zoom > 0) {
-        zoom = 1;
-    };
+    window.addEventListener('mousemove', function (mousePos) {
+        mousePosX = mousePos.x - canvas.getBoundingClientRect().left;
+        mousePosY = mousePos.y - canvas.getBoundingClientRect().top;
+    });
+
+    // Source - https://stackoverflow.com/a/322827
+    // Posted by Eugene Lazutkin, modified by community. See post 'Timeline' for change history
+    // Retrieved 2026-11-05, License - CC BY-SA 4.0
+
+    document.body.onmousedown = function () {
+        mouseDown = true;
+    }
+    document.body.onmouseup = function () {
+        mouseDown = false;
+    }
 
     var i = 0;
 
+
+
     function gameLoop() {
-        canvas.width = window.innerWidth * 0.3;
-        canvas.height = window.innerHeight * 0.3;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         cycleCount++;
         if (cycleCount => 60) cycleCount = 0;
@@ -95,26 +114,42 @@
         oldCycleTime = startTime;
         if (cycleCount % 60 == 0) fpsRate = Math.floor(fpsRate = 1000 / cycleTime);
 
+        var mouseTileX = Math.floor(mousePosX / (MAP_SIZE / 3.25)); // i have no idea why 3.25 is the golden number
+        var mouseTileY = Math.floor(mousePosY / (MAP_SIZE / 3.25));
+
+        var indexOnMouse = 0;
+        // needed for setting tiles: prevents setting them if mouse isn't on grid)
+        if (mouseTileX > MAP_SIZE - 1 || mouseTileY > (MAP_SIZE) - 1) {
+            indexOnMouse = null;
+        } else {
+            indexOnMouse = Math.floor(mouseTileX + (mouseTileY * MAP_SIZE));
+        }
+
+        console.log(indexOnMouse);
+
+
         for (var row = 0; row < MAP_SIZE; row++) {
             for (var col = 0; col < MAP_SIZE; col++) {
                 var square = row * MAP_SIZE + col;
                 if (map[square] != 0) {
-                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.8 + zoom), (3.8 + zoom));
+                    context.drawImage(WALLS[map[square]], 0, 0, 64, 64, Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.5 + zoom), (3.5 + zoom))
                 } else {
                     context.fillStyle = '#000000'
-                    context.fillRect(Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.8 + zoom), (3.8 + zoom)); // 3.8 instead of 4 for outlines
+                    context.fillRect(Math.floor(mapOffsetX + col * (4 + zoom)), Math.floor(mapOffsetY + row * (4 + zoom)), (3.5 + zoom), (3.5 + zoom)); // 3.8 instead of 4 for outlines
                 }
-
             }
         }
 
+        if (mouseDown) {
+            map[indexOnMouse] = 1;
+        }
 
         setTimeout(gameLoop, cycleDelay);
 
         // this renders fps to screen for debugging purposes
-        context.fillStyle = 'Black';
-        context.font = '16px Monospace';
-        context.fillText('FPS: ' + fpsRate, 0, 20);
+        // context.fillStyle = 'Black';
+        // context.font = '16px Monospace';
+        // context.fillText('FPS: ' + fpsRate, 0, 20);
 
     } window.onload = function () { gameLoop(); };
 
