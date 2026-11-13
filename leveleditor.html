@@ -35,6 +35,8 @@
 
     const mapSave = document.getElementById('mapSave');
     const mapNew = document.getElementById('mapNew');
+    const ChooseFile = document.getElementById('ChooseFile');
+    const mapLoad = document.getElementById('mapLoad');
 
     const WIDTH = 320, HALF_WIDTH = WIDTH / 2;
     const HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
@@ -92,11 +94,23 @@
             description: "Empty space, sprites and entities can be put here",
         },
         {
-            name: "Brick Wall",
+            name: "wall tile",
             description: "used to build level geometry",
         },
         {
-            name: "Fence",
+            name: "wall tile bymp",
+            description: "used to build level geometry",
+        },
+        {
+            name: "wall tile glass",
+            description: "used to build level geometry",
+        },
+        {
+            name: "crate",
+            description: "used to build level geometry",
+        },
+        {
+            name: "crate",
             description: "used to build level geometry",
         },
     ]
@@ -124,13 +138,13 @@
 
     document.onkeydown = function (event) {
         switch (event.keyCode) {
-            case 61: zoom += 1; break; // = (+)
-            case 173: zoom += -1; break; // -
+            // case 61: zoom += 1; break; // = (+)
+            // case 173: zoom += -1; break; // -
 
-            case 87: mapOffsetY -= 2 + (zoom / 2); break; // W
-            case 65: mapOffsetX -= 2 + (zoom / 2); break; // A
-            case 83: mapOffsetY += 2 + (zoom / 2); break;
-            case 68: mapOffsetX += 2 + (zoom / 2); break;
+            // case 87: mapOffsetY -= 2 + (zoom / 2); break; // W
+            // case 65: mapOffsetX -= 2 + (zoom / 2); break; // A
+            // case 83: mapOffsetY += 2 + (zoom / 2); break;
+            // case 68: mapOffsetX += 2 + (zoom / 2); break;
 
             case 81: setTile += -1; break;
             case 69: setTile += 1; break;
